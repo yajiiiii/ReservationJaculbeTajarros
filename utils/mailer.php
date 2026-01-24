@@ -1,9 +1,29 @@
 <?php
 header('Content-Type: application/json');
-$brevoApiKey = getenv('BREVO_API') ?: (isset($_ENV['BREVO_API']) ? $_ENV['BREVO_API'] : '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');
 
-$senderEmail = getenv('BREVO_SENDER_EMAIL') ?: (isset($_ENV['BREVO_SENDER_EMAIL']) ? $_ENV['BREVO_SENDER_EMAIL'] : 'tajarroszedrick021@gmail.com');
-$senderName = getenv('BREVO_SENDER_NAME') ?: (isset($_ENV['BREVO_SENDER_NAME']) ? $_ENV['BREVO_SENDER_NAME'] : 'PAHINGA');
+// Load environment variables
+$brevoApiKey = getenv('BREVO_API') ?: (isset($_ENV['BREVO_API']) ? $_ENV['BREVO_API'] : null);
+$senderEmail = getenv('BREVO_SENDER_EMAIL') ?: (isset($_ENV['BREVO_SENDER_EMAIL']) ? $_ENV['BREVO_SENDER_EMAIL'] : null);
+$senderName = getenv('BREVO_SENDER_NAME') ?: (isset($_ENV['BREVO_SENDER_NAME']) ? $_ENV['BREVO_SENDER_NAME'] : null);
+
+// Validate required environment variables
+if (empty($brevoApiKey)) {
+  http_response_code(500);
+  echo json_encode(['success' => false, 'error' => 'BREVO_API environment variable is not set']);
+  exit;
+}
+
+if (empty($senderEmail)) {
+  http_response_code(500);
+  echo json_encode(['success' => false, 'error' => 'BREVO_SENDER_EMAIL environment variable is not set']);
+  exit;
+}
+
+if (empty($senderName)) {
+  http_response_code(500);
+  echo json_encode(['success' => false, 'error' => 'BREVO_SENDER_NAME environment variable is not set']);
+  exit;
+}
 
 $requiredFields = ['customerName', 'customerEmail', 'customerContact', 'roomName', 'checkIn', 'checkOut', 'nights', 'dateReserved', 'paymentType', 'base', 'discount', 'charge', 'total'];
 
