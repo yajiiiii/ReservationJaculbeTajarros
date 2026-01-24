@@ -1,15 +1,82 @@
 <?php
 header('Content-Type: application/json');
 
-// Load environment variables
-$brevoApiKey = getenv('BREVO_API') ?: (isset($_ENV['BREVO_API']) ? $_ENV['BREVO_API'] : null);
-$senderEmail = getenv('BREVO_SENDER_EMAIL') ?: (isset($_ENV['BREVO_SENDER_EMAIL']) ? $_ENV['BREVO_SENDER_EMAIL'] : null);
-$senderName = getenv('BREVO_SENDER_NAME') ?: (isset($_ENV['BREVO_SENDER_NAME']) ? $_ENV['BREVO_SENDER_NAME'] : null);
+/**
+ * Load environment variables from .env file
+ * This function parses .env file and loads variables into $_ENV and putenv()
+ */
+function loadEnvFile($envPath) {
+  if (!file_exists($envPath)) {
+    return false;
+  }
+  
+  $lines = file($envPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+  foreach ($lines as $line) {
+    // Skip comments
+    if (strpos(trim($line), '#') === 0) {
+      continue;
+    }
+    
+    // Parse KEY=VALUE pairs
+    if (strpos($line, '=') !== false) {
+      list($key, $value) = explode('=', $line, 2);
+      $key = trim($key);
+      $value = trim($value);
+      
+      // Remove quotes if present
+      if ((substr($value, 0, 1) === '"' && substr($value, -1) === '"') ||
+          (substr($value, 0, 1) === "'" && substr($value, -1) === "'")) {
+        $value = substr($value, 1, -1);
+      }
+      
+      // Set in both $_ENV and putenv() for compatibility
+      $_ENV[$key] = $value;
+      putenv("$key=$value");
+    }
+  }
+  
+  return true;
+}
+
+// Try to load .env file from multiple possible locations
+$possiblePaths = [
+  __DIR__ . '/../.env',           // Root folder (one level up from utils/)
+  __DIR__ . '/../../.env',         // Two levels up (if utils is nested)
+  $_SERVER['DOCUMENT_ROOT'] . '/ReservationJaculbeTajarros/.env',  // Absolute path from document root
+  dirname(__DIR__) . '/.env',      // Using dirname for better path resolution
+];
+
+$envLoaded = false;
+$envPath = null;
+foreach ($possiblePaths as $path) {
+  $realPath = realpath($path);
+  if ($realPath !== false && file_exists($realPath)) {
+    $envPath = $realPath;
+    if (loadEnvFile($realPath)) {
+      $envLoaded = true;
+      break;
+    }
+  }
+}
+
+// Load environment variables (check getenv, $_ENV, and $_SERVER in order)
+// Trim values to remove any whitespace
+$brevoApiKey = trim(getenv('BREVO_API') ?: (isset($_ENV['BREVO_API']) ? $_ENV['BREVO_API'] : (isset($_SERVER['BREVO_API']) ? $_SERVER['BREVO_API'] : '')));
+$senderEmail = trim(getenv('BREVO_SENDER_EMAIL') ?: (isset($_ENV['BREVO_SENDER_EMAIL']) ? $_ENV['BREVO_SENDER_EMAIL'] : (isset($_SERVER['BREVO_SENDER_EMAIL']) ? $_SERVER['BREVO_SENDER_EMAIL'] : '')));
+$senderName = trim(getenv('BREVO_SENDER_NAME') ?: (isset($_ENV['BREVO_SENDER_NAME']) ? $_ENV['BREVO_SENDER_NAME'] : (isset($_SERVER['BREVO_SENDER_NAME']) ? $_SERVER['BREVO_SENDER_NAME'] : '')));
 
 // Validate required environment variables
 if (empty($brevoApiKey)) {
   http_response_code(500);
-  echo json_encode(['success' => false, 'error' => 'BREVO_API environment variable is not set']);
+  // Only show debug info if we're in development (you can remove this in production)
+  $debugInfo = '';
+  if (isset($_GET['debug']) || (isset($_SERVER['HTTP_HOST']) && strpos($_SERVER['HTTP_HOST'], 'localhost') !== false)) {
+    $debugInfo = $envLoaded ? ' (Env file loaded from: ' . ($envPath ?: 'unknown') . ')' : ' (No .env file found. Checked paths: ' . count($possiblePaths) . ' locations)';
+  }
+  echo json_encode([
+    'success' => false, 
+    'error' => 'BREVO_API environment variable is not set' . $debugInfo
+  ]);
   exit;
 }
 
@@ -279,7 +346,10 @@ function generateReceiptHtml($data) {
 }
 
 function sendEmailViaBrevo($toEmail, $toName, $htmlContent) {
-  global $brevoApiKey;
+  global $brevoApiKey, $senderEmail, $senderName;
+  
+  // Ensure API key is trimmed
+  $brevoApiKey = trim($brevoApiKey);
   
   if (empty($brevoApiKey)) {
     return [
@@ -289,13 +359,11 @@ function sendEmailViaBrevo($toEmail, $toName, $htmlContent) {
   }
 
   $url = 'https://api.brevo.com/v3/smtp/email';
-
-  global $senderEmail, $senderName;
   
   $emailData = [
     'sender' => [
-      'name' => $senderName,
-      'email' => $senderEmail
+      'name' => trim($senderName),
+      'email' => trim($senderEmail)
     ],
     'to' => [
       [
@@ -338,6 +406,16 @@ function sendEmailViaBrevo($toEmail, $toName, $htmlContent) {
   } else {
     $errorData = json_decode($response, true);
     $errorMessage = isset($errorData['message']) ? $errorData['message'] : 'Unknown error';
+    
+    // Provide more helpful error messages for common issues
+    if ($httpCode === 401) {
+      if (strpos($errorMessage, 'not enabled') !== false || strpos($errorMessage, 'API Key is not enabled') !== false) {
+        $errorMessage .= '. Please check: 1) API key is correct, 2) API key has SMTP permissions enabled in Brevo dashboard, 3) API key is not expired.';
+      } else {
+        $errorMessage .= '. Please verify your BREVO_API key is correct and has proper permissions.';
+      }
+    }
+    
     return [
       'success' => false,
       'error' => 'Brevo API error (' . $httpCode . '): ' . $errorMessage

@@ -398,12 +398,45 @@
 
           const result = await response.text();
           
-          if (response.ok) {
-            // Redirect to home page
-            window.location.href = basePath + '/?page=home';
-          } else {
-            console.error('Email sending failed:', result);
-            alert('Failed to send confirmation email. Please try again.');
+          try {
+            const jsonResult = JSON.parse(result);
+            if (response.ok && jsonResult.success) {
+              // Close the modal first
+              const modalEl = modal || document.getElementById('reservation_summary_modal');
+              if (modalEl) {
+                modalEl.classList.add('hidden');
+                document.body.style.overflow = '';
+              }
+              
+              // Show success alert
+              alert('Your reservation has been successfully submitted. Please check your email for the confirmation receipt.');
+              
+              // Redirect to home page
+              const base = basePath.endsWith('/') ? basePath.slice(0, -1) : basePath;
+              window.location.href = base + '/?page=home';
+            } else {
+              console.error('Email sending failed:', jsonResult.error || result);
+              alert('Failed to send confirmation email. Please try again.');
+            }
+          } catch (parseError) {
+            console.error('Failed to parse response:', parseError, result);
+            if (response.ok) {
+              // Close the modal first
+              const modalEl = modal || document.getElementById('reservation_summary_modal');
+              if (modalEl) {
+                modalEl.classList.add('hidden');
+                document.body.style.overflow = '';
+              }
+              
+              // Show success alert
+              alert('Your reservation has been successfully submitted. Please check your email for the confirmation receipt.');
+              
+              // Redirect to home page
+              const base = basePath.endsWith('/') ? basePath.slice(0, -1) : basePath;
+              window.location.href = base + '/?page=home';
+            } else {
+              alert('Failed to send confirmation email. Please try again.');
+            }
           }
         } catch (error) {
           console.error('Error sending email:', error);

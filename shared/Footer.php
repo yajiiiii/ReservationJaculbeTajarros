@@ -1,5 +1,6 @@
 <?php
 // Footer component
+$base_path = "/ReservationJaculbeTajarros";
 ?>
 <footer role="contentinfo" class="relative w-full text-white overflow-hidden pt-0 bg-[#1e88e5]">
   <div class="relative z-10 border-t border-white/10">
@@ -54,7 +55,7 @@
           <h4 class="font-bold mb-6 text-white">Navigate</h4>
           <ul class="space-y-4">
             <li>
-              <a class="group flex items-center gap-2 text-[#bbdefb]/50 hover:text-[#bbdefb] transition-colors" href="#work">
+              <a class="group flex items-center gap-2 text-[#bbdefb]/50 hover:text-[#bbdefb] transition-colors" href="<?php echo $base_path; ?>/#popular">
                 Popular
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-up-right w-3 h-3 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" aria-hidden="true">
                   <path d="M7 7h10v10"></path>
@@ -63,7 +64,7 @@
               </a>
             </li>
             <li>
-              <a class="group flex items-center gap-2 text-[#bbdefb]/50 hover:text-[#bbdefb] transition-colors" href="#work">
+              <a class="group flex items-center gap-2 text-[#bbdefb]/50 hover:text-[#bbdefb] transition-colors" href="<?php echo $base_path; ?>/#process">
                 Process
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-up-right w-3 h-3 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" aria-hidden="true">
                   <path d="M7 7h10v10"></path>
@@ -72,7 +73,7 @@
               </a>
             </li>
             <li>
-              <a class="group flex items-center gap-2 text-[#bbdefb]/50 hover:text-[#bbdefb] transition-colors" href="#process">
+              <a class="group flex items-center gap-2 text-[#bbdefb]/50 hover:text-[#bbdefb] transition-colors" href="<?php echo $base_path; ?>/?page=about">
                 About Us
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-arrow-up-right w-3 h-3 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" aria-hidden="true">
                   <path d="M7 7h10v10"></path>

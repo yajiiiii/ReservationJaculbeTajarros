@@ -43,9 +43,7 @@ $selectedRoomPrice = $room ? (float)$room['price'] : 0.0;
 
 <section class="bg-[#f8f8f8] text-white">
   <main class="flex min-h-screen flex-col items-center justify-center">
-    <section class="py-12 min-h-screen w-full flex md:items-center md:justify-center bg-transparent relative overflow-hidden pb-8 md:pb-0">
-      
-
+    <section class="py-12 lg:py-0 min-h-screen w-full flex md:items-center md:justify-center bg-transparent relative overflow-hidden pb-8 md:pb-0">
       <div class="w-full max-w-[1800px] mx-auto relative z-10 lg:py-12 md:pt-0 px-4 md:px-6 lg:px-12 xl:px-24">
         <div class="mb-6">
           <a
@@ -92,21 +90,21 @@ $selectedRoomPrice = $room ? (float)$room['price'] : 0.0;
             <div class="absolute left-6 right-6 bottom-6">
               <div class="flex flex-wrap items-end justify-between gap-4">
                 <div>
-                  <p class="text-xs font-semibold text-white/85 uppercase tracking-wider">
+                  <p class="text-xs font-semibold text-[#90caf9] uppercase tracking-wider">
                     <?php echo strtoupper(htmlspecialchars($type)); ?>
                   </p>
-                  <h2 class="text-2xl md:text-4xl font-black text-white tracking-tight">
+                  <h2 class="text-2xl md:text-4xl font-black text-[#90caf9] tracking-tight">
                     <?php echo htmlspecialchars($selectedRoomLabel); ?>
                   </h2>
-                  <p class="text-sm text-white/80 mt-1">
+                  <p class="text-sm text-[#90caf9] mt-1">
                     <?php echo $room ? htmlspecialchars($room['location']) : '—'; ?>
                   </p>
                 </div>
-                <div class="rounded-2xl bg-white/95 px-4 py-3 text-slate-900 shadow-sm">
-                  <p class="text-xs font-semibold text-slate-500">Price</p>
-                  <p class="text-lg font-black">
+                <div class="rounded-2xl bg-white/95 px-4 py-3 text-[#023e7d] shadow-sm">
+                  <p class="text-xs font-semibold text-[#023e7d]">Price</p>
+                  <p class="text-lg font-black text-[#1e88e5]">
                     ₱<?php echo number_format($selectedRoomPrice, 0); ?>
-                    <span class="text-xs font-semibold text-slate-500">/night</span>
+                    <span class="text-xs font-semibold text-[#023e7d]">/night</span>
                   </p>
                 </div>
               </div>
@@ -123,45 +121,45 @@ $selectedRoomPrice = $room ? (float)$room['price'] : 0.0;
               <div class="rounded-3xl border border-slate-200 bg-white p-6 md:p-8">
                 <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                   <div>
-                    <h3 class="text-xl font-black text-slate-900">Your stay</h3>
-                    <p class="text-sm text-slate-500 mt-1">Select check‑in and check‑out dates to update nights and billing.</p>
-                  </div>
+                    <h3 class="text-xl font-black text-[#1e88e5]">Your stay</h3>
+                    <p class="text-sm text-[#023e7d] mt-1">Select check‑in and check‑out dates to update nights and billing.</p>
+                  </div>  
                   <div class="flex flex-wrap gap-2">
-                    <span class="inline-flex items-center rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-700">
-                      Hosted by: <span class="ml-1 text-slate-900"><?php echo $room ? htmlspecialchars($room['hosted_by']) : '—'; ?></span>
+                    <span class="inline-flex items-center rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-[#1e88e5]">
+                      Hosted by: <span class="ml-1 text-[#1e88e5]"><?php echo $room ? htmlspecialchars($room['hosted_by']) : '—'; ?></span>
                     </span>
-                    <span class="inline-flex items-center rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-slate-700">
-                      Capacity: <span class="ml-1 text-slate-900"><?php echo $room ? htmlspecialchars($room['capacity']) : '—'; ?></span>
+                    <span class="inline-flex items-center rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-semibold text-[#1e88e5]">
+                      Capacity: <span class="ml-1 text-[#1e88e5]"><?php echo $room ? htmlspecialchars($room['capacity']) : '—'; ?></span>
                     </span>
                   </div>
                 </div>
 
                 <div class="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
-                    <label for="check_in_input" class="block text-xs font-semibold text-slate-500 uppercase mb-2">Check‑in</label>
+                    <label for="check_in_input" class="block text-xs font-semibold text-[#023e7d] uppercase mb-2">Check‑in</label>
                     <input
                       id="check_in_input"
                       type="date"
                       value="<?php echo $checkIn ? htmlspecialchars($checkIn) : ''; ?>"
-                      class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none focus:border-[#1e88e5] focus:ring-2 focus:ring-[#1e88e5]/20"
+                      class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-[#023e7d] outline-none focus:border-[#1e88e5] focus:ring-2 focus:ring-[#1e88e5]/20"
                     />
                   </div>
                   <div>
-                    <label for="check_out_input" class="block text-xs font-semibold text-slate-500 uppercase mb-2">Check‑out</label>
+                    <label for="check_out_input" class="block text-xs font-semibold text-[#023e7d] uppercase mb-2">Check‑out</label>
                     <input
                       id="check_out_input"
                       type="date"
                       value="<?php echo $checkOut ? htmlspecialchars($checkOut) : ''; ?>"
-                      class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none focus:border-[#1e88e5] focus:ring-2 focus:ring-[#1e88e5]/20"
+                      class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-[#023e7d] outline-none focus:border-[#1e88e5] focus:ring-2 focus:ring-[#1e88e5]/20"
                     />
                   </div>
                   <div>
-                    <label class="block text-xs font-semibold text-slate-500 uppercase mb-2">Nights</label>
-                    <div class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900">
+                    <label class="block text-xs font-semibold text-[#023e7d] uppercase mb-2">Nights</label>
+                    <div class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-[#023e7d]">
                       <span id="ui_nights" class="font-black"><?php echo $nights ? htmlspecialchars((string)$nights) : '—'; ?></span>
-                      <span class="text-slate-500 font-semibold ml-1">night(s)</span>
+                      <span class="text-[#023e7d] font-semibold ml-1">night(s)</span>
                     </div>
-                    <div id="date_warning" class="hidden mt-2 rounded-2xl border border-amber-200 bg-amber-50 p-3 text-amber-900">
+                    <div id="date_warning" class="hidden mt-2 rounded-2xl border border-amber-200 bg-amber-50 p-3 text-[#023e7d]">
                       <p class="text-xs font-semibold">Check‑out must be after check‑in.</p>
                     </div>
                   </div>
@@ -170,15 +168,15 @@ $selectedRoomPrice = $room ? (float)$room['price'] : 0.0;
 
               <!-- About (no background) -->
               <div class="border-t border-slate-200 pt-6">
-                <h3 class="text-lg font-black text-slate-900">About this room</h3>
-                <p class="mt-2 text-sm text-slate-600 leading-relaxed">
+                <h3 class="text-lg font-black text-[#1e88e5]">About this room</h3>
+                <p class="mt-2 text-base text-[#023e7d] leading-relaxed">
                   <?php echo $room && isset($room['detailed_description']) ? htmlspecialchars($room['detailed_description']) : ($room ? htmlspecialchars($room['description']) : 'Choose a room from the Rooms page to view details.'); ?>
                 </p>
               </div>
 
               <div class="border-t border-slate-200 pt-6">
-                <h4 class="text-sm font-black text-slate-900">What this place offers</h4>
-                <ul class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-slate-700">
+                <h4 class="text-base font-black text-[#1e88e5]">What this place offers</h4>
+                <ul class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2 text-base text-[#023e7d]">
                   <?php if ($room && isset($room['offers']) && is_array($room['offers'])): ?>
                     <?php foreach ($room['offers'] as $offer): ?>
                       <li class="flex items-center gap-2">
@@ -187,7 +185,7 @@ $selectedRoomPrice = $room ? (float)$room['price'] : 0.0;
                       </li>
                     <?php endforeach; ?>
                   <?php else: ?>
-                    <li class="text-slate-500">—</li>
+                    <li class="text-[#023e7d]">—</li>
                   <?php endif; ?>
                 </ul>
               </div>

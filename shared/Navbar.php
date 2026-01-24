@@ -7,7 +7,7 @@ $base_path = "/ReservationJaculbeTajarros";
 
 <nav 
   id="main-navbar"
-  class="fixed top-4 left-1/2 -translate-x-1/2 w-[95%] bg-white backdrop-blur-md rounded-full shadow-md z-50 transition-all duration-300 translate-y-0 opacity-100"
+  class="fixed top-4 left-1/2 -translate-x-1/2 w-[95%] bg-white backdrop-blur-md rounded-full shadow-md z-50 transition-all duration-300 translate-y-0 opacity-100 navbar-visible"
 >
   <div class="py-4 px-6">
     <div class="flex items-center justify-between gap-4">
@@ -34,15 +34,15 @@ $base_path = "/ReservationJaculbeTajarros";
         <!-- Mobile Menu Button -->
         <button
           id="mobile-menu-button"
-          class="lg:hidden p-2 rounded-full hover:bg-gray-800 transition-colors"
+          class="md:hidden p-2 rounded-full hover:bg-gray-100 transition-colors"
           type="button"
           aria-label="Toggle mobile menu"
           aria-expanded="false"
         >
-          <svg id="menu-icon" class="w-5 h-5 text-gray-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg id="menu-icon" class="w-5 h-5 text-slate-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
           </svg>
-          <svg id="close-icon" class="w-5 h-5 text-gray-300 hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg id="close-icon" class="w-5 h-5 text-slate-600 hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
@@ -56,3 +56,126 @@ $menuSection = 'mobile';
 include __DIR__ . '/Menu.php'; 
 ?>
 <div class="h-12 md:hidden"></div>
+
+<script>
+(function() {
+  const navbar = document.getElementById('main-navbar');
+  let lastScrollY = 0;
+  let isVisible = true;
+
+  const handleScroll = () => {
+    const currentScrollY = window.scrollY;
+    
+    if (currentScrollY > lastScrollY && currentScrollY > 50) {
+      // Scrolling down - hide navbar
+      if (isVisible) {
+        navbar.classList.remove('translate-y-0', 'opacity-100', 'navbar-visible');
+        navbar.classList.add('-translate-y-24', 'opacity-0', 'navbar-hidden');
+        isVisible = false;
+      }
+    } else {
+      // Scrolling up - show navbar
+      if (!isVisible) {
+        navbar.classList.remove('-translate-y-24', 'opacity-0', 'navbar-hidden');
+        navbar.classList.add('translate-y-0', 'opacity-100', 'navbar-visible');
+        isVisible = true;
+      }
+    }
+    
+    lastScrollY = currentScrollY;
+  };
+
+  window.addEventListener('scroll', handleScroll, { passive: true });
+
+  // Function to close mobile menu
+  const closeMobileMenu = () => {
+    const mobileMenu = document.getElementById('mobile-menu');
+    const menuIcon = document.getElementById('menu-icon');
+    const closeIcon = document.getElementById('close-icon');
+    const menuItems = document.querySelectorAll('.mobile-menu-item');
+    const menuFooter = document.querySelector('.mobile-menu-footer');
+    
+    if (mobileMenu) {
+      mobileMenu.classList.add('opacity-0', 'pointer-events-none');
+      mobileMenu.classList.remove('opacity-100');
+      if (menuIcon) menuIcon.classList.remove('hidden');
+      if (closeIcon) closeIcon.classList.add('hidden');
+      document.body.style.overflow = '';
+      
+      // Reset menu items
+      menuItems.forEach((item) => {
+        item.style.opacity = '0';
+        item.style.transform = 'translateY(20px)';
+      });
+      
+      if (menuFooter) {
+        menuFooter.style.opacity = '0';
+      }
+    }
+  };
+
+  // Function to open mobile menu
+  const openMobileMenu = () => {
+    const mobileMenu = document.getElementById('mobile-menu');
+    const menuIcon = document.getElementById('menu-icon');
+    const closeIcon = document.getElementById('close-icon');
+    const menuItems = document.querySelectorAll('.mobile-menu-item');
+    const menuFooter = document.querySelector('.mobile-menu-footer');
+    
+    if (mobileMenu) {
+      mobileMenu.classList.remove('opacity-0', 'pointer-events-none');
+      mobileMenu.classList.add('opacity-100');
+      if (menuIcon) menuIcon.classList.add('hidden');
+      if (closeIcon) closeIcon.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+      
+      // Animate menu items
+      menuItems.forEach((item, index) => {
+        setTimeout(() => {
+          item.style.opacity = '1';
+          item.style.transform = 'none';
+          item.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+        }, index * 50);
+      });
+      
+      // Animate footer
+      if (menuFooter) {
+        setTimeout(() => {
+          menuFooter.style.opacity = '1';
+          menuFooter.style.transition = 'opacity 0.3s ease';
+        }, menuItems.length * 50);
+      }
+    }
+  };
+
+  // Mobile menu toggle
+  const mobileMenuButton = document.getElementById('mobile-menu-button');
+  const mobileMenu = document.getElementById('mobile-menu');
+  const mobileMenuClose = document.getElementById('mobile-menu-close');
+
+  if (mobileMenuButton && mobileMenu) {
+    mobileMenuButton.addEventListener('click', function() {
+      const isHidden = mobileMenu.classList.contains('opacity-0') || mobileMenu.classList.contains('pointer-events-none');
+      
+      if (isHidden) {
+        openMobileMenu();
+      } else {
+        closeMobileMenu();
+      }
+    });
+  }
+
+  // Close button inside menu
+  if (mobileMenuClose) {
+    mobileMenuClose.addEventListener('click', closeMobileMenu);
+  }
+
+  // Close menu when clicking on a link
+  if (mobileMenu) {
+    const menuLinks = mobileMenu.querySelectorAll('a');
+    menuLinks.forEach(link => {
+      link.addEventListener('click', closeMobileMenu);
+    });
+  }
+})();
+</script>

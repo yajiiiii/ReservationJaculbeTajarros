@@ -15,7 +15,7 @@ if (!in_array($roomType, $validTypes)) {
   <main class="flex min-h-screen flex-col items-center justify-center">
     <section class="py-12 min-h-screen w-full flex md:items-center md:justify-center bg-transparent relative overflow-hidden pb-8 md:pb-0">
       <?php include __DIR__ . '/../../shared/DynamicNav.php'; ?>
-      <div class="p-4 w-full max-w-[1800px] mx-auto relative z-10 p-4 md:p-6 lg:p-12 xl:p-24">
+      <div class="p-4 w-full max-w-[1800px] mx-auto relative z-10 pt-20 md:p-6 lg:p-12 xl:p-24">
         <?php
           // Include the appropriate room component
           if ($roomType === 'regular') {

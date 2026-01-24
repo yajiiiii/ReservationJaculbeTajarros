@@ -36,11 +36,11 @@ $asset_base = $host ? ($protocol . "://" . $host . $basePath) : $basePath;
         />
         <div class="absolute inset-0 rounded-tl-3xl rounded-tr-3xl bg-linear-to-t from-black/45 via-black/0 to-black/0"></div>
         <?php if ($index === 0): ?>
-        <div class="absolute left-5 top-5 inline-flex items-center rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-slate-900">
+        <div class="absolute left-5 top-5 inline-flex items-center rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-[#1e88e5]">
           Premium
         </div>
         <?php elseif ($index === 4): ?>
-        <div class="absolute left-5 top-5 inline-flex items-center rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-slate-900">
+        <div class="absolute left-5 top-5 inline-flex items-center rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-[#1e88e5]">
           Family Pick
         </div>
         <?php endif; ?>
@@ -48,14 +48,14 @@ $asset_base = $host ? ($protocol . "://" . $host . $basePath) : $basePath;
       <div class="p-6">
         <div class="flex items-start justify-between gap-4">
           <div>
-            <h3 class="text-lg font-bold text-slate-900"><?php echo htmlspecialchars($room['name']); ?></h3>
-            <p class="mt-1 text-sm text-slate-500"><?php echo htmlspecialchars($room['description']); ?></p>
+            <h3 class="text-lg font-bold text-[#1e88e5]"><?php echo htmlspecialchars($room['name']); ?></h3>
+            <p class="mt-1 text-sm text-[#023e7d]"><?php echo htmlspecialchars($room['description']); ?></p>
           </div>
-          <p class="text-sm font-bold text-slate-900 whitespace-nowrap">
-            ₱<?php echo number_format($room['price'], 0); ?><span class="text-xs font-semibold text-slate-500">/night</span>
+          <p class="text-sm font-bold text-[#1e88e5] whitespace-nowrap">
+            ₱<?php echo number_format($room['price'], 0); ?><span class="text-xs font-semibold text-[#023e7d]">/night</span>
           </p>
         </div>
-        <ul class="mt-5 grid grid-cols-2 gap-x-4 gap-y-2 text-sm text-slate-600">
+        <ul class="mt-5 grid grid-cols-2 gap-x-4 gap-y-2 text-sm text-[#023e7d]">
           <li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-[#1e88e5]"></span><?php echo $room['capacity']; ?></li>
           <li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-[#1e88e5]"></span>King bed</li>
           <li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-[#1e88e5]"></span>Fast Wi‑Fi</li>
