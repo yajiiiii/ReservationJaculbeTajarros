@@ -6,6 +6,7 @@
     const roomType = container.getAttribute('data-room-type') || 'regular';
     const capacityType = container.getAttribute('data-capacity-type') || 'single';
     const basePath = container.getAttribute('data-base-path') || '/ReservationJaculbeTajarros';
+    const roomId = container.getAttribute('data-room-id') || '0';
     
     const elName = document.getElementById('cust_name');
     const elEmail = document.getElementById('cust_email');
@@ -66,50 +67,121 @@
       return { nights, valid: true, hasBoth: true };
     }
 
-    function validateForm() {
+    function validateForm(showErrors) {
+      const errors = [];
       const name = elName ? (elName.value || '').trim() : '';
       const email = elEmail ? (elEmail.value || '').trim() : '';
       const contact = elContact ? (elContact.value || '').trim() : '';
       const paymentType = elPayment ? (elPayment.value || '').trim() : '';
+      const cal = computeNights();
 
-      if (name.length === 0 || email.length === 0 || contact.length === 0 || paymentType.length === 0) {
-        return false;
+      // Date validation
+      const checkInVal = elCheckIn ? (elCheckIn.value || '').trim() : '';
+      const checkOutVal = elCheckOut ? (elCheckOut.value || '').trim() : '';
+      if (!checkInVal || !checkOutVal) {
+        errors.push('Please select check-in and check-out dates to compute total bill.');
+      } else if (!cal.valid || cal.nights <= 0) {
+        errors.push('Check-out date must be after check-in date.');
       }
 
-      // Validate email format
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email)) {
-        return false;
+      // Room capacity check
+      if (!capacityType || capacityType === '') {
+        errors.push('No selected room capacity.');
       }
 
-      // Validate contact number (11 digits)
-      if (contact.length !== 11 || !/^\d+$/.test(contact)) {
-        return false;
+      // Room type check
+      if (!roomType || roomType === '') {
+        errors.push('No selected room type.');
       }
 
+      // Customer fields
+      if (name.length === 0) {
+        errors.push('Customer name is required.');
+      }
+      if (email.length === 0) {
+        errors.push('Email is required.');
+      } else {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+          errors.push('Please enter a valid email address.');
+        }
+      }
+      if (contact.length === 0) {
+        errors.push('Contact number is required.');
+      } else if (contact.length !== 11 || !/^\d+$/.test(contact)) {
+        errors.push('Contact number must be exactly 11 digits.');
+      }
+
+      // Payment type check
+      if (!paymentType || paymentType === '') {
+        errors.push('No selected type of payment.');
+      }
+
+      // Payment-specific fields
       if (paymentType === 'credit') {
         const cardNumber = document.getElementById('card_number')?.value?.trim() || '';
         const cardExp = document.getElementById('card_exp')?.value?.trim() || '';
         const cardCvc = document.getElementById('card_cvc')?.value?.trim() || '';
         const cardZip = document.getElementById('card_zip')?.value?.trim() || '';
-        if (cardNumber.length === 0 || cardExp.length === 0 || cardCvc.length === 0 || cardZip.length === 0) {
-          return false;
+        if (!cardNumber || !cardExp || !cardCvc || !cardZip) {
+          errors.push('Please fill in all credit card details.');
         }
       } else if (paymentType === 'cheque') {
         const chequeNumber = document.getElementById('cheque_number')?.value?.trim() || '';
-        if (chequeNumber.length === 0) {
-          return false;
+        if (!chequeNumber) {
+          errors.push('Please enter the cheque number.');
         }
       }
 
-      return true;
+      // Show error toast if requested
+      if (showErrors && errors.length > 0) {
+        showValidationErrors(errors);
+      }
+
+      return errors.length === 0;
+    }
+
+    function showValidationErrors(errors) {
+      // Remove existing error toast
+      const existing = document.getElementById('validation-error-toast');
+      if (existing) existing.remove();
+
+      const toast = document.createElement('div');
+      toast.id = 'validation-error-toast';
+      toast.className = 'fixed top-6 right-6 z-[8000] max-w-sm w-full animate-slide-in-right';
+      toast.innerHTML = `
+        <div class="rounded-2xl bg-white border border-red-200 shadow-xl p-4">
+          <div class="flex items-start gap-3">
+            <div class="flex-shrink-0 mt-0.5">
+              <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+              </svg>
+            </div>
+            <div class="flex-1">
+              <h4 class="text-sm font-black text-[#023e7d]">Incomplete Information</h4>
+              <ul class="mt-2 space-y-1">
+                ${errors.map(e => `<li class="text-xs text-red-600 flex items-start gap-1.5"><span class="mt-1 h-1.5 w-1.5 rounded-full bg-red-400 flex-shrink-0"></span>${e}</li>`).join('')}
+              </ul>
+            </div>
+            <button onclick="this.closest('#validation-error-toast').remove()" class="flex-shrink-0 p-1 rounded-lg hover:bg-slate-100 transition cursor-pointer">
+              <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(toast);
+
+      // Auto-remove after 6 seconds
+      setTimeout(() => {
+        if (toast.parentNode) toast.remove();
+      }, 6000);
     }
 
     function updateButtonState() {
       if (!btnNext) return;
-      const isValid = validateForm();
+      const isValid = validateForm(false);
       btnNext.disabled = !isValid;
-      
+
       if (isValid) {
         btnNext.classList.remove('bg-slate-300', 'cursor-not-allowed', 'hover:bg-slate-300');
         btnNext.classList.add('bg-[#1e88e5]', 'hover:bg-[#1565c0]');
@@ -313,8 +385,13 @@
     }
 
     if (btnNext) {
+      // Always enable the button so users can click and see errors
+      btnNext.disabled = false;
+      btnNext.classList.remove('bg-slate-300', 'cursor-not-allowed', 'hover:bg-slate-300');
+      btnNext.classList.add('bg-[#1e88e5]', 'hover:bg-[#1565c0]', 'cursor-pointer');
+
       btnNext.addEventListener('click', async function () {
-        if (!validateForm()) return;
+        if (!validateForm(true)) return;
         await updateCalculations();
         await openModal();
       });
@@ -369,14 +446,12 @@
 
         // Collect all reservation data
         const reservationData = {
+          room_id: roomId,
           customerName: elName ? elName.value.trim() : '',
           customerEmail: elEmail ? elEmail.value.trim() : '',
           customerContact: elContact ? elContact.value.trim() : '',
-          roomName: document.getElementById('modal_room')?.textContent?.trim() || '—',
           checkIn: elCheckIn ? elCheckIn.value.trim() : '',
           checkOut: elCheckOut ? elCheckOut.value.trim() : '',
-          nights: sumNights ? (sumNights.textContent?.trim() || '0') : '0',
-          dateReserved: modalDateReserved ? (modalDateReserved.textContent?.trim() || '') : '',
           paymentType: elPayment ? elPayment.value : 'cash',
           base: getNumericValue(sumBase),
           discount: getNumericValue(sumDiscount),
@@ -384,63 +459,82 @@
           total: getNumericValue(sumTotal)
         };
 
-        // Send email via mailer
+        // Save reservation to database
         const formData = new FormData();
         Object.keys(reservationData).forEach(key => {
           formData.append(key, reservationData[key]);
         });
 
         try {
-          const response = await fetch(basePath + '/utils/mailer.php', {
+          const response = await fetch(basePath + '/utils/save_reservation.php', {
             method: 'POST',
             body: formData
           });
 
-          const result = await response.text();
-          
-          try {
-            const jsonResult = JSON.parse(result);
-            if (response.ok && jsonResult.success) {
-              // Close the modal first
-              const modalEl = modal || document.getElementById('reservation_summary_modal');
-              if (modalEl) {
-                modalEl.classList.add('hidden');
-                document.body.style.overflow = '';
-              }
-              
-              // Show success alert
-              alert('Your reservation has been successfully submitted. Please check your email for the confirmation receipt.');
-              
-              // Redirect to home page
-              const base = basePath.endsWith('/') ? basePath.slice(0, -1) : basePath;
-              window.location.href = base + '/?page=home';
-            } else {
-              console.error('Email sending failed:', jsonResult.error || result);
-              alert('Failed to send confirmation email. Please try again.');
+          const result = await response.json();
+
+          if (result.success) {
+            // Close the reservation summary modal
+            const modalEl = modal || document.getElementById('reservation_summary_modal');
+            if (modalEl) {
+              modalEl.classList.add('hidden');
             }
-          } catch (parseError) {
-            console.error('Failed to parse response:', parseError, result);
-            if (response.ok) {
-              // Close the modal first
-              const modalEl = modal || document.getElementById('reservation_summary_modal');
-              if (modalEl) {
-                modalEl.classList.add('hidden');
-                document.body.style.overflow = '';
-              }
-              
-              // Show success alert
-              alert('Your reservation has been successfully submitted. Please check your email for the confirmation receipt.');
-              
-              // Redirect to home page
-              const base = basePath.endsWith('/') ? basePath.slice(0, -1) : basePath;
-              window.location.href = base + '/?page=home';
-            } else {
-              alert('Failed to send confirmation email. Please try again.');
-            }
+
+            // Show success UI overlay
+            const successOverlay = document.createElement('div');
+            successOverlay.id = 'reservation_success_overlay';
+            successOverlay.className = 'fixed inset-0 z-[7000] flex items-center justify-center p-4';
+            successOverlay.innerHTML = `
+              <div class="absolute inset-0 bg-black/55 backdrop-blur-sm"></div>
+              <div class="relative w-full max-w-md rounded-3xl bg-white shadow-2xl overflow-hidden text-center">
+                <div class="pt-10 pb-4 px-6">
+                  <div class="mx-auto mb-6 flex items-center justify-center w-20 h-20 rounded-full bg-emerald-100">
+                    <svg class="w-10 h-10 text-emerald-500 animate-[scale-in_0.4s_ease-out]" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                    </svg>
+                  </div>
+                  <h3 class="text-2xl font-black text-[#023e7d] tracking-tight">Reservation Confirmed!</h3>
+                  <p class="text-sm text-[#023e7d]/60 mt-2 leading-relaxed">Your booking has been successfully saved. You can view your reservation details in the admin panel.</p>
+                </div>
+
+                <div class="mx-6 mb-6 rounded-2xl bg-slate-50 border border-slate-200 p-4 text-left space-y-2">
+                  <div class="flex justify-between text-sm">
+                    <span class="text-[#023e7d]/50">Room</span>
+                    <span class="font-semibold text-[#023e7d]">${document.getElementById('modal_room')?.textContent || '—'}</span>
+                  </div>
+                  <div class="flex justify-between text-sm">
+                    <span class="text-[#023e7d]/50">Guest</span>
+                    <span class="font-semibold text-[#023e7d]">${elName ? elName.value.trim() : '—'}</span>
+                  </div>
+                  <div class="flex justify-between text-sm">
+                    <span class="text-[#023e7d]/50">Dates</span>
+                    <span class="font-semibold text-[#023e7d]">${elCheckIn?.value || '—'} → ${elCheckOut?.value || '—'}</span>
+                  </div>
+                  <div class="h-px bg-slate-200"></div>
+                  <div class="flex justify-between text-base">
+                    <span class="font-black text-[#023e7d]">Total</span>
+                    <span class="font-black text-[#1e88e5]">₱${getNumericValue(sumTotal) !== '0' ? Number(getNumericValue(sumTotal)).toLocaleString() : '0'}</span>
+                  </div>
+                </div>
+
+                <div class="px-6 pb-8 flex gap-3">
+                  <a href="${basePath}/?page=home" class="flex-1 inline-flex items-center justify-center rounded-2xl border border-slate-200 px-5 py-3 text-sm font-semibold text-[#023e7d] hover:bg-slate-50 transition">
+                    Back to Home
+                  </a>
+                  <a href="${basePath}/?page=home" class="flex-1 inline-flex items-center justify-center rounded-2xl bg-[#1e88e5] px-5 py-3 text-sm font-semibold text-white hover:bg-[#1565c0] transition">
+                    Ok
+                  </a>
+                </div>
+              </div>
+            `;
+            document.body.appendChild(successOverlay);
+            document.body.style.overflow = 'hidden';
+          } else {
+            alert(result.error || 'Failed to save reservation. Please try again.');
           }
         } catch (error) {
-          console.error('Error sending email:', error);
-          alert('An error occurred while sending the confirmation email. Please try again.');
+          console.error('Error saving reservation:', error);
+          alert('An error occurred. Please try again.');
         }
       });
     }

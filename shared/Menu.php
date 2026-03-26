@@ -20,6 +20,10 @@ if (isset($menuSection)) {
         class="text-sm text-[#023e7d]/50 hover:text-[#023e7d] transition-colors font-medium px-2">
         About Us
       </a>
+      <a href="<?php echo $base_path; ?>/?page=admin"
+        class="text-sm text-[#023e7d]/50 hover:text-[#023e7d] transition-colors font-medium px-2">
+        Admin
+      </a>
     </div>
   <?php
   }
@@ -79,6 +83,13 @@ if (isset($menuSection)) {
             href="<?php echo $base_path; ?>/#contact"
             class="text-4xl font-bold tracking-tighter transition-colors block outline-none focus-visible:text-cyan-300 text-white hover:text-cyan-200">
             Contact
+          </a>
+        </div>
+        <div class="mobile-menu-item" style="opacity: 0; transform: translateY(20px);">
+          <a
+            href="<?php echo $base_path; ?>/?page=admin"
+            class="text-4xl font-bold tracking-tighter transition-colors block outline-none focus-visible:text-cyan-300 text-white hover:text-cyan-200">
+            Admin
           </a>
         </div>
       </div>

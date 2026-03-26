@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../../../constant/constant.php';
+require_once __DIR__ . '/../../../database/Database.php';
 
 // Expected vars from Reservation.php
 $room = isset($reservation_room) ? $reservation_room : null;
@@ -9,6 +10,20 @@ $capacityType = isset($reservation_capacity_type) ? $reservation_capacity_type :
 $checkIn = isset($reservation_check_in) ? $reservation_check_in : '';
 $checkOut = isset($reservation_check_out) ? $reservation_check_out : '';
 $nights = isset($reservation_nights) ? (int)$reservation_nights : 0;
+
+// Look up room ID from database
+$dbRoomId = 0;
+if ($roomName && $roomName !== '—') {
+  try {
+    $dbConn = Database::getInstance()->getConnection();
+    $stmtRoom = $dbConn->prepare("SELECT id FROM rooms WHERE name = :name LIMIT 1");
+    $stmtRoom->execute([':name' => $roomName]);
+    $dbRoom = $stmtRoom->fetch();
+    if ($dbRoom) $dbRoomId = (int)$dbRoom['id'];
+  } catch (Exception $e) {
+    $dbRoomId = 0;
+  }
+}
 
 // Calculate for default payment (cash) using PHP
 $calculations = calculateTotal($nights, $roomType, $capacityType, 'cash');
@@ -26,6 +41,7 @@ $base_path = isset($base_path) ? $base_path : "/ReservationJaculbeTajarros";
   data-capacity-type="<?php echo htmlspecialchars($capacityType); ?>"
   data-nights="<?php echo htmlspecialchars((string)$nights); ?>"
   data-base-path="<?php echo htmlspecialchars($base_path); ?>"
+  data-room-id="<?php echo $dbRoomId; ?>"
 >
   <div class="p-6 border-b border-slate-100">
     <h3 class="text-lg font-black text-[#1e88e5]">Billing statement</h3>

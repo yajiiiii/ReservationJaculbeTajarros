@@ -40,6 +40,8 @@
       include __DIR__ . '/pages/rooms/Rooms.php';
     } elseif ($page === 'reservation') {
       include __DIR__ . '/pages/reservation/Reservation.php';
+    } elseif ($page === 'admin') {
+      include __DIR__ . '/pages/admin/Admin.php';
     } else {
       // Default to home page
       include __DIR__ . '/pages/home/Home.php';
